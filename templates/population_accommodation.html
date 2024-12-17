@@ -1,0 +1,172 @@
+<!-- templates/population_accommodation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Population and Accommodation Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .insight-card {
+            height: 100%;
+            transition: transform 0.2s;
+        }
+        .insight-card:hover {
+            transform: translateY(-5px);
+        }
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .key-metric {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .analysis-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<!-- Navbar for other pages -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <i class="bi bi-graph-up-arrow text-primary me-2"></i>
+            <span class="fw-bold">Tourism Analytics</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/nuts1_and_nuts2">NUTS1 & NUTS2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/nuts1_foreign-domestic">NUTS1 Foreign & Domestic</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/nuts2-foreign-domestic">NUTS2 Foreign & Domestic</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/population-accommodation">Population Impact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <div class="container pt-5">
+        <h1 class="text-center mb-4 pt-5">Population and Accommodation Analysis</h1>
+
+        <!-- Key Insights -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card insight-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Highest Intensity Region</h5>
+                        <p class="key-metric">{{ analysis.insights.nuts1_highest_intensity[0] }}</p>
+                        <p class="metric-label">{{ "{:.2f}".format(analysis.insights.nuts1_highest_intensity[1]) }} guests per capita</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card insight-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Peak Season</h5>
+                        <p class="key-metric">{{ analysis.insights.peak_month_nuts1 }}</p>
+                        <p class="metric-label">Seasonality Index: {{ "{:.2f}".format(analysis.insights.seasonality_index_nuts1) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card insight-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tourist Pressure Index</h5>
+                        <p class="key-metric">{{ "{:.2f}".format(analysis.insights.seasonality_index_nuts1) }}</p>
+                        <p class="metric-label">Higher values indicate more seasonal variation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualizations -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="chart-container">
+                    <h3 class="mb-3">Regional Accommodation Intensity</h3>
+                    <div id="intensity-map"></div>
+                </div>
+            </div>
+            <div class="col-12 mb-4">
+                <div class="chart-container">
+                    <h3 class="mb-3">Seasonal Patterns</h3>
+                    <div id="seasonal-pattern"></div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="chart-container">
+                    <h3 class="mb-3">Population vs Accommodation Correlation</h3>
+                    <div id="population-accommodation"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Summary -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Key Findings</h4>
+                        <div class="analysis-card p-3 mt-3">
+                            <h5>Regional Pressure</h5>
+                            <p>The region {{ analysis.insights.nuts1_highest_intensity[0] }} shows the highest tourist pressure with {{ "{:.2f}".format(analysis.insights.nuts1_highest_intensity[1]) }} guests per capita.</p>
+                        </div>
+                        <div class="analysis-card p-3">
+                            <h5>Seasonal Patterns</h5>
+                            <p>Peak accommodation occurs in {{ analysis.insights.peak_month_nuts1 }} with significant seasonal variation (index: {{ "{:.2f}".format(analysis.insights.seasonality_index_nuts1) }}).</p>
+                        </div>
+                        <div class="analysis-card p-3">
+                            <h5>Population Impact</h5>
+                            <p>The lowest accommodation intensity is found in {{ analysis.insights.nuts1_lowest_intensity[0] }} with {{ "{:.2f}".format(analysis.insights.nuts1_lowest_intensity[1]) }} guests per capita.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Plot intensity map
+        var intensityMapData = {{ plot_data.intensity_map | safe }};
+        Plotly.newPlot('intensity-map', intensityMapData.data, intensityMapData.layout);
+        
+        // Plot seasonal pattern
+        var seasonalPatternData = {{ plot_data.seasonal_pattern | safe }};
+        Plotly.newPlot('seasonal-pattern', seasonalPatternData.data, seasonalPatternData.layout);
+        
+        // Plot population vs accommodation
+        var populationAccommodationData = {{ plot_data.population_accommodation | safe }};
+        Plotly.newPlot('population-accommodation', populationAccommodationData.data, populationAccommodationData.layout);
+    </script>
+</body>
+</html>

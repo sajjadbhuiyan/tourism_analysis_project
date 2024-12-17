@@ -1,0 +1,177 @@
+<!-- templates/nuts2_foreign_domestic.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUTS2 Domestic vs Foreign Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .stats-card {
+            height: 100%;
+            transition: transform 0.2s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .value-highlight {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .percentage-bar {
+            height: 20px;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+        .chart-container {
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Navbar for other pages -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <i class="bi bi-graph-up-arrow text-primary me-2"></i>
+            <span class="fw-bold">Tourism Analytics</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/nuts1_and_nuts2">NUTS1 & NUTS2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/nuts1_foreign-domestic">NUTS1 Foreign & Domestic</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/nuts2-foreign-domestic">NUTS2 Foreign & Domestic</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/population-accommodation">Population Impact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+    <div class="container pt-5">
+        <!-- Header -->
+        <h1 class="text-center mb-4 pt-5">NUTS2 Domestic vs Foreign Visitors Analysis</h1>
+        
+        <!-- Overview Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Visitors Distribution</h5>
+                        <div id="visitor-distribution" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Domestic Statistics</h5>
+                        <p>Total: <span class="value-highlight">{{ "{:,.0f}".format(analysis.domestic.total) }}</span></p>
+                        <p>Monthly Average: {{ "{:,.0f}".format(analysis.domestic.average_monthly) }}</p>
+                        <p>Peak Month: {{ analysis.domestic.peak_month }}</p>
+                        <p>Low Month: {{ analysis.domestic.low_month }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Foreign Statistics</h5>
+                        <p>Total: <span class="value-highlight">{{ "{:,.0f}".format(analysis.foreign.total) }}</span></p>
+                        <p>Monthly Average: {{ "{:,.0f}".format(analysis.foreign.average_monthly) }}</p>
+                        <p>Peak Month: {{ analysis.foreign.peak_month }}</p>
+                        <p>Low Month: {{ analysis.foreign.low_month }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row">
+            <div class="col-12">
+                <div class="chart-container">
+                    <div id="monthly-comparison"></div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="chart-container">
+                    <div id="regional-distribution"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regional Details -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Top Domestic Regions</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for region, value in analysis.domestic.top_regions.items() %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ region }}
+                                <span class="badge bg-primary rounded-pill">{{ "{:,.0f}".format(value) }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Top Foreign Regions</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for region, value in analysis.foreign.top_regions.items() %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ region }}
+                                <span class="badge bg-warning rounded-pill">{{ "{:,.0f}".format(value) }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Plot visitor distribution
+        var visitorDistributionData = {{ plot_data.visitor_distribution | safe }};
+        Plotly.newPlot('visitor-distribution', visitorDistributionData.data, visitorDistributionData.layout);
+        
+        // Plot monthly comparison
+        var monthlyComparisonData = {{ plot_data.monthly_comparison | safe }};
+        Plotly.newPlot('monthly-comparison', monthlyComparisonData.data, monthlyComparisonData.layout);
+        
+        // Plot regional distribution
+        var regionalDistributionData = {{ plot_data.regional_distribution | safe }};
+        Plotly.newPlot('regional-distribution', regionalDistributionData.data, regionalDistributionData.layout);
+    </script>
+</body>
+</html>
